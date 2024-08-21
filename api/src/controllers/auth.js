@@ -64,7 +64,7 @@ export const login = (req, res) => {
         // Synchronous Sign with default (HMAC SHA256)
         const token = jwt.sign({ id: result[0].id }, process.env.PRIVATE_KEY);
 
-        res.cookie("access_token", token, {
+        res.cookie(process.env.COOKIE_NAME, token, {
             httpOnly: true,
         })
             .status(200)
@@ -76,7 +76,7 @@ export const login = (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.clearCookie("access_token", {
+    res.clearCookie(process.env.COOKIE_NAME, {
         sameSite: "none",
         secure: true,
     })
