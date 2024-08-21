@@ -1,11 +1,62 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import moment from "moment";
 import ReactQuill from "react-quill";
+import axios from "axios";
 import "react-quill/dist/quill.snow.css";
 
 const Write = () => {
-    const [value, setValue] = useState("");
-    const [title, setTitle] = useState("");
+    const state = useLocation().state;
+
+    const [value, setValue] = useState(state?.desc || "");
+    const [title, setTitle] = useState(state?.title || "");
     const [file, setFile] = useState(null);
+    const [cat, setCat] = useState(state?.cat || "");
+
+    const navigate = useNavigate();
+
+    const uploadImage = async () => {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await axios.post("/upload", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return res.data;
+        } catch (err) {
+            console.error("Error uploading image:", err);
+        }
+    };
+
+    const handleClick = async (e) => {
+        e.preventDefault();
+        const imgUrl = uploadImage();
+
+        try {
+            state
+                ? await axios.put(`/posts/${state.id}`, {
+                      title,
+                      desc: value,
+                      img: file ? imgUrl : "",
+                      cat,
+                      updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+                  })
+                : await axios.post("/posts/", {
+                      title,
+                      desc: value,
+                      img: file ? imgUrl : "",
+                      cat,
+                      date: moment().format("YYYY-MM-DD HH:mm:ss"),
+                      createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+                      updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+                  });
+            navigate("/");
+        } catch (err) {
+            console.error("Error posting blog:", err);
+        }
+    };
 
     return (
         <div className="add">
@@ -13,6 +64,7 @@ const Write = () => {
                 <input
                     type="text"
                     placeholder="Title"
+                    value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
                 <div className="editorContainer">
@@ -38,20 +90,30 @@ const Write = () => {
                         type="file"
                         id="file"
                         name=""
-                        onChange={(e) => setFile(e.target.files[0])}
+                        onChange={(e) => {
+                            console.log(e.target);
+                            setFile(e.target.files[0]);
+                        }}
                     />
                     <label className="file" htmlFor="file">
                         Upload Image
                     </label>
                     <div className="buttons">
                         <button>Save as a draft</button>
-                        <button>Publish</button>
+                        <button onClick={handleClick}>Publish</button>
                     </div>
                 </div>
                 <div className="item">
                     <h1>Category</h1>
                     <div className="cat">
-                        <input type="radio" name="cat" value="art" id="art" />
+                        <input
+                            type="radio"
+                            name="cat"
+                            value="art"
+                            id="art"
+                            checked={cat === "art"}
+                            onChange={(e) => setCat(e.target.value)}
+                        />
                         <label htmlFor="art">Art</label>
                     </div>
                     <div className="cat">
@@ -60,6 +122,8 @@ const Write = () => {
                             name="cat"
                             value="science"
                             id="science"
+                            checked={cat === "science"}
+                            onChange={(e) => setCat(e.target.value)}
                         />
                         <label htmlFor="science">Science</label>
                     </div>
@@ -69,6 +133,8 @@ const Write = () => {
                             name="cat"
                             value="technology"
                             id="technology"
+                            checked={cat === "technology"}
+                            onChange={(e) => setCat(e.target.value)}
                         />
                         <label htmlFor="technology">Technology</label>
                     </div>
@@ -78,6 +144,8 @@ const Write = () => {
                             name="cat"
                             value="cinema"
                             id="cinema"
+                            checked={cat === "cinema"}
+                            onChange={(e) => setCat(e.target.value)}
                         />
                         <label htmlFor="cinema">Cinema</label>
                     </div>
@@ -87,11 +155,20 @@ const Write = () => {
                             name="cat"
                             value="design"
                             id="design"
+                            checked={cat === "design"}
+                            onChange={(e) => setCat(e.target.value)}
                         />
                         <label htmlFor="design">Design</label>
                     </div>
                     <div className="cat">
-                        <input type="radio" name="cat" value="food" id="food" />
+                        <input
+                            type="radio"
+                            name="cat"
+                            value="food"
+                            id="food"
+                            checked={cat === "food"}
+                            onChange={(e) => setCat(e.target.value)}
+                        />
                         <label htmlFor="food">Food</label>
                     </div>
                 </div>

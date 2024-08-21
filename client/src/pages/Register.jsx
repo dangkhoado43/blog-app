@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AUTH_PATH } from "../constants/URLConstant";
 
 const Register = () => {
     const [inputs, setInputs] = useState({
@@ -10,6 +9,10 @@ const Register = () => {
         password: "",
     });
 
+    const [err, setError] = useState(null);
+
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -17,9 +20,18 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(inputs);
+        if (!inputs.username || !inputs.email || !inputs.password) {
+            setError("All fields are required!");
+            return;
+        }
 
-        const res = await axios.post(`${AUTH_PATH}/register`);
+        try {
+            await axios.post("/auth/register", inputs);
+            setError(null);
+            navigate("/login");
+        } catch (err) {
+            setError(err.response.data || "An error occurred");
+        }
     };
 
     return (
@@ -47,8 +59,8 @@ const Register = () => {
                     required
                     onChange={handleChange}
                 />
-                <button>Register</button>
-                <p>This is an error!</p>
+                <button type="submit">Register</button>
+                {err && <p className="error-message">{err}</p>}
                 <span>
                     Do you have an account? <Link to="/login">Login</Link>
                 </span>

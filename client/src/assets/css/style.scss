@@ -2,6 +2,7 @@ $lightBlue: #b9e7e7;
 $lightGreen: #198754;
 $lightRed: #dc3545;
 $lightGray: #dad4b5;
+$darkBlue: #021526;
 
 .app {
     display: flex;
@@ -24,7 +25,7 @@ $lightGray: #dad4b5;
             background-color: $lightBlue;
 
             h1 {
-                font-size: 20px;
+                font-size: 24px;
                 color: teal;
                 margin-bottom: 20px;
             }
@@ -98,21 +99,27 @@ $lightGray: #dad4b5;
                     }
 
                     span {
+                        color: $darkBlue;
+                        font-weight: bold;
                         cursor: pointer;
                     }
 
                     .logout {
                         .link {
-                            background-color: #fff;
-                            color: $lightRed;
+                            background-color: $lightRed;
+                            color: #fff;
                             padding: 6px 12px;
                             border-radius: 10px;
-                            border: 1px solid $lightRed;
+                            border: 2px solid $lightRed;
                             font-weight: 600;
                         }
                         .link:hover {
-                            color: #fff;
-                            background-color: $lightRed;
+                            border: 2px solid #fff;
+                        }
+                        .link:active {
+                            background-color: #fff;
+                            color: $lightRed;
+                            border: 2px solid $lightRed;
                         }
                     }
 
@@ -122,13 +129,58 @@ $lightGray: #dad4b5;
                             color: #fff;
                             padding: 6px 12px;
                             border-radius: 10px;
-                            border: 1px solid $lightGreen;
+                            border: 2px solid $lightGreen;
                             font-weight: 600;
                         }
 
                         .link:hover {
+                            border: 2px solid #fff;
+                        }
+
+                        .link:active {
+                            background-color: #fff;
+                            color: $lightGreen;
+                            border: 2px solid $lightGreen;
+                        }
+                    }
+
+                    .login {
+                        .link {
+                            background-color: $lightGreen;
+                            color: #fff;
+                            padding: 6px 12px;
+                            border-radius: 10px;
+                            border: 2px solid $lightGreen;
+                            font-weight: 600;
+                        }
+
+                        .link:hover {
+                            border: 2px solid #fff;
+                        }
+
+                        .link:active {
                             color: $lightGreen;
                             background-color: #fff;
+                            border: 2px solid $lightGreen;
+                        }
+                    }
+
+                    .signup {
+                        .link {
+                            background-color: $lightRed;
+                            color: #fff;
+                            padding: 6px 12px;
+                            border-radius: 10px;
+                            border: 2px solid $lightRed;
+                            font-weight: 600;
+                        }
+                        .link:hover {
+                            border: 2px solid #fff;
+                        }
+                        .link:active {
+                            color: $lightRed;
+                            background-color: #fff;
+                            border: 2px solid $lightRed;
                         }
                     }
                 }

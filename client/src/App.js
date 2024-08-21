@@ -2,6 +2,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { Home, Login, Register, Single, Write } from "./pages";
 import { Navbar, Footer } from "./components";
 import "./assets/css/style.scss";
+import { AuthProvider } from "./context/AuthContext";
 
 const Layout = () => {
     return (
@@ -35,11 +36,13 @@ const router = createBrowserRouter([
 
 function App() {
     return (
-        <div className="app">
-            <div className="container">
-                <RouterProvider router={router} />
+        <AuthProvider>
+            <div className="app">
+                <div className="container">
+                    <RouterProvider router={router} />
+                </div>
             </div>
-        </div>
+        </AuthProvider>
     );
 }
 

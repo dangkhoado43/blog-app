@@ -1,70 +1,84 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import DOMPurify from "dompurify";
+import moment from "moment";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 import Edit from "../assets/imgs/edit.png";
 import Delete from "../assets/imgs/delete.png";
 import Menu from "../components/Menu";
 
 const Single = () => {
+    const [post, setPost] = useState(null);
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const postId = location.pathname.split("/")[2];
+
+    if (postId) {
+        navigate("/");
+    }
+
+    const { currentUser } = useContext(AuthContext);
+
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`/posts/${postId}`);
+            navigate("/");
+        } catch (err) {
+            console.error("Error when deleting post:", err);
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(`/posts/${postId}`);
+                setPost(res.data);
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        };
+        fetchData();
+    }, [postId]);
+
+    const getText = (html) => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        return doc.body.textContent;
+    };
+
     return (
         <div className="single">
             <div className="content">
-                <img
-                    src="https://images.pexels.com/photos/3135356/pexels-photo-3135356.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    alt=""
-                />
+                <img src={`../upload/${post?.img}`} alt="post" />
                 <div className="user">
-                    <img
-                        src="https://media.istockphoto.com/id/1364917563/vi/anh/doanh-nh%C3%A2n-m%E1%BB%89m-c%C6%B0%E1%BB%9Di-v%E1%BB%9Bi-c%C3%A1nh-tay-khoanh-l%E1%BA%A1i-tr%C3%AAn-n%E1%BB%81n-tr%E1%BA%AFng.jpg?s=1024x1024&w=is&k=20&c=ldkLDyGrvDusqqr3qW_LjXbxIwBlYXV18tOZF5fi-Bs="
-                        alt=""
-                    />
+                    {post.userImg && <img src={post.userImg} alt="user" />}
                     <div className="info">
-                        <span>John</span>
-                        <p>Posted 2 days ago</p>
+                        <span>{post.username}</span>
+                        <p>Posted {moment(post.date).fromNow()}</p>
                     </div>
-                    <div className="edit">
-                        <Link to={`/write?edit=2`}>
-                            <img src={Edit} alt="" />
-                        </Link>
-                        <img src={Delete} alt="" />
-                    </div>
+                    {currentUser.username === post.username && (
+                        <div className="edit">
+                            <Link to={`/write`} state={post}>
+                                <img src={Edit} alt="update" />
+                            </Link>
+                            <img
+                                onClick={handleDelete}
+                                src={Delete}
+                                alt="delete"
+                            />
+                        </div>
+                    )}
                 </div>
-                <h1>
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                </h1>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Quisquam, voluptatibus voluptates quae expedita, cumque
-                    deleniti nesciunt veniam rem nisi debitis, tempore magnam
-                    aperiam facere autem doloribus?
-                    <br />
-                    <br />
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Quisquam, voluptatibus voluptates quae expedita, cumque
-                    deleniti nesciunt veniam rem nisi debitis, tempore magnam
-                    aperiam facere autem doloribus? Lorem ipsum dolor sit amet
-                    consectetur adipisicing elit. Quisquam, voluptatibus
-                    voluptates quae expedita, cumque deleniti nesciunt veniam
-                    rem nisi debitis, tempore magnam aperiam facere autem
-                    doloribus? Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Quisquam, voluptatibus voluptates quae
-                    expedita, cumque deleniti nesciunt veniam rem nisi debitis,
-                    tempore magnam aperiam facere autem doloribus?
-                    <br />
-                    <br />
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Quisquam, voluptatibus voluptates quae expedita, cumque
-                    deleniti nesciunt veniam rem nisi debitis, tempore magnam
-                    aperiam facere autem doloribus? Lorem ipsum dolor sit amet
-                    consectetur adipisicing elit. Quisquam, voluptatibus
-                    voluptates quae expedita, cumque deleniti nesciunt veniam
-                    rem nisi debitis, tempore magnam aperiam facere autem
-                    doloribus? Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Quisquam, voluptatibus voluptates quae
-                    expedita, cumque deleniti nesciunt veniam rem nisi debitis,
-                    tempore magnam aperiam facere autem doloribus?
-                </p>
+                <h1>{post.title}</h1>
+                <p
+                    dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(post.desc),
+                    }}
+                ></p>
             </div>
-            <Menu />
+            <Menu cat={post.cat} />
         </div>
     );
 };
