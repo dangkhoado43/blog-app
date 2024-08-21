@@ -9,14 +9,16 @@ import Delete from "../assets/imgs/delete.png";
 import Menu from "../components/Menu";
 
 const Single = () => {
-    const [post, setPost] = useState(null);
+    const [post, setPost] = useState({});
+
+    console.log(post);
 
     const location = useLocation();
     const navigate = useNavigate();
 
     const postId = location.pathname.split("/")[2];
 
-    if (postId) {
+    if (!postId) {
         navigate("/");
     }
 
@@ -32,7 +34,7 @@ const Single = () => {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchPost = async () => {
             try {
                 const res = await axios.get(`/posts/${postId}`);
                 setPost(res.data);
@@ -40,7 +42,7 @@ const Single = () => {
                 console.error("Error:", err);
             }
         };
-        fetchData();
+        fetchPost();
     }, [postId]);
 
     const getText = (html) => {
@@ -53,7 +55,7 @@ const Single = () => {
             <div className="content">
                 <img src={`../upload/${post?.img}`} alt="post" />
                 <div className="user">
-                    {post.userImg && <img src={post.userImg} alt="user" />}
+                    {/* {post.userImg && <img src={post.userImg} alt="user" />} */}
                     <div className="info">
                         <span>{post.username}</span>
                         <p>Posted {moment(post.date).fromNow()}</p>

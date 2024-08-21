@@ -4,19 +4,18 @@ import axios from "axios";
 
 function Menu({ cat }) {
     const [posts, setPosts] = useState([]);
-
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchPosts = async () => {
             try {
                 const res = await axios.get(`/posts/?cat=${cat}`);
                 setPosts(res.data);
             } catch (err) {
-                console.error("Error:", err);
+                console.error("Error fetching posts:", err);
             }
         };
-        fetchData();
+        fetchPosts();
     }, [cat]);
 
     // const posts = [
@@ -52,8 +51,7 @@ function Menu({ cat }) {
     //     },
     // ];
 
-    const handleReadMore = (e, id) => {
-        e.preventDefault();
+    const handleReadMore = (id) => {
         navigate(`/post/${id}`);
     };
 
@@ -64,11 +62,7 @@ function Menu({ cat }) {
                 <div className="post" key={post.id}>
                     <img src={`../upload/${post?.img}`} alt="post" />
                     <h2>{post.title}</h2>
-                    <button
-                        onClick={(e) => {
-                            handleReadMore(e, post.id);
-                        }}
-                    >
+                    <button onClick={() => handleReadMore(post.id)}>
                         Read More
                     </button>
                 </div>

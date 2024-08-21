@@ -21,6 +21,8 @@ export const getPost = (req, res) => {
     db.query(q, [req.params.id], (err, result) => {
         if (err) return res.status(500).json("There is error in processing!");
 
+        console.log(result[0]);
+
         return res.status(200).json(result[0]);
     });
 };
@@ -31,16 +33,22 @@ export const addPost = (req, res) => {
 
     jwt.verify(token, process.env.PRIVATE_KEY, (err, userInfo) => {
         if (err) return res.status(403).json("Token is not valid!");
+        console.log("test 2");
 
         const { title, desc, img, date, cat } = req.body;
+
+        console.log("test 3");
 
         if (!title || !desc || !date) {
             return res.status(400).json("Missing required fields!");
         }
 
+        console.log("test 4");
+
         const q =
             "INSERT INTO posts(`title`, `desc`, `img`, `cat`, `date`, `uid`, `createdAt`, `updatedAt`) VALUES (?)";
 
+        console.log("test 5");
         const values = [
             title,
             desc,
@@ -52,9 +60,16 @@ export const addPost = (req, res) => {
             new Date(),
         ];
 
+        console.log("test 8");
+        console.log(values);
+
         db.query(q, [values], (err, result) => {
-            if (err)
+            console.log("test 9");
+            console.log([values]);
+            if (err) {
+                console.log(err);
                 return res.status(400).json("There is error in processing!");
+            }
 
             return res.status(200).json("Post has been created!");
         });

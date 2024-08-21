@@ -8,7 +8,7 @@ import "react-quill/dist/quill.snow.css";
 const Write = () => {
     const state = useLocation().state;
 
-    const [value, setValue] = useState(state?.desc || "");
+    const [desc, setDesc] = useState(state?.desc || "");
     const [title, setTitle] = useState(state?.title || "");
     const [file, setFile] = useState(null);
     const [cat, setCat] = useState(state?.cat || "");
@@ -17,14 +17,13 @@ const Write = () => {
 
     const uploadImage = async () => {
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            const res = await axios.post("/upload", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            return res.data;
+            if (file !== null && file !== undefined) {
+                const formData = new FormData();
+                formData.append("file", file);
+                const res = await axios.post("/upload", formData);
+                return res.data;
+            }
+            return "";
         } catch (err) {
             console.error("Error uploading image:", err);
         }
@@ -34,18 +33,25 @@ const Write = () => {
         e.preventDefault();
         const imgUrl = uploadImage();
 
+        console.log(123);
+
+        console.log(imgUrl);
+
+        console.log(4);
+
         try {
+            console.log("test");
             state
                 ? await axios.put(`/posts/${state.id}`, {
                       title,
-                      desc: value,
+                      desc,
                       img: file ? imgUrl : "",
                       cat,
                       updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
                   })
                 : await axios.post("/posts/", {
                       title,
-                      desc: value,
+                      desc,
                       img: file ? imgUrl : "",
                       cat,
                       date: moment().format("YYYY-MM-DD HH:mm:ss"),
@@ -71,8 +77,8 @@ const Write = () => {
                     <ReactQuill
                         className="editor"
                         theme="snow"
-                        value={value}
-                        onChange={setValue}
+                        value={desc}
+                        onChange={setDesc}
                     />
                 </div>
             </div>
@@ -89,9 +95,7 @@ const Write = () => {
                         style={{ display: "none" }}
                         type="file"
                         id="file"
-                        name=""
                         onChange={(e) => {
-                            console.log(e.target);
                             setFile(e.target.files[0]);
                         }}
                     />

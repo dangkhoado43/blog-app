@@ -4,21 +4,20 @@ import axios from "axios";
 
 const Home = () => {
     const [posts, setPosts] = useState([]);
+    const navigate = useNavigate();
 
     const cat = useLocation().search;
 
-    const navigate = useNavigate();
-
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchPosts = async () => {
             try {
                 const res = await axios.get(`/posts/?cat=${cat}`);
                 setPosts(res.data);
             } catch (err) {
-                console.error("Error:", err);
+                console.error("Error fetching posts:", err);
             }
         };
-        fetchData();
+        fetchPosts();
     }, [cat]);
 
     const getText = (html) => {
@@ -59,9 +58,8 @@ const Home = () => {
     //     },
     // ];
 
-    const handleReadMore = (e, id) => {
-        e.preventDefault();
-        navigate(`/post/${id}`);
+    const handleReadMore = (id) => {
+        // navigate(`/post/${id}`);
     };
 
     return (
@@ -70,18 +68,14 @@ const Home = () => {
                 {posts.map((post) => (
                     <div className="post" key={post.id}>
                         <div className="img">
-                            <img src={`../upload/${post.img}`} alt="" />
+                            <img src={`../upload/${post.img}`} alt="post" />
                         </div>
                         <div className="content">
                             <Link to={`/post/${post.id}`} className="link">
                                 <h1>{post.title}</h1>
                             </Link>
                             <p>{getText(post.desc)}</p>
-                            <button
-                                onClick={(e) => {
-                                    handleReadMore(e, post.id);
-                                }}
-                            >
+                            <button onClick={() => handleReadMore(post.id)}>
                                 Read More
                             </button>
                         </div>
