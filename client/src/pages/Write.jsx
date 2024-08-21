@@ -11,7 +11,7 @@ const Write = () => {
     const [desc, setDesc] = useState(state?.desc || "");
     const [title, setTitle] = useState(state?.title || "");
     const [file, setFile] = useState(null);
-    const [cat, setCat] = useState(state?.cat || "");
+    const [cat, setCat] = useState(state?.cat || "default");
 
     const navigate = useNavigate();
 
@@ -26,38 +26,35 @@ const Write = () => {
             return "";
         } catch (err) {
             console.error("Error uploading image:", err);
+            return "";
         }
     };
 
     const handleClick = async (e) => {
         e.preventDefault();
-        const imgUrl = uploadImage();
-
-        console.log(123);
-
-        console.log(imgUrl);
-
-        console.log(4);
-
         try {
-            console.log("test");
-            state
-                ? await axios.put(`/posts/${state.id}`, {
-                      title,
-                      desc,
-                      img: file ? imgUrl : "",
-                      cat,
-                      updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
-                  })
-                : await axios.post("/posts/", {
-                      title,
-                      desc,
-                      img: file ? imgUrl : "",
-                      cat,
-                      date: moment().format("YYYY-MM-DD HH:mm:ss"),
-                      createdAt: moment().format("YYYY-MM-DD HH:mm:ss"),
-                      updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
-                  });
+            let imgUrl = "";
+            if (file) {
+                imgUrl = await uploadImage();
+            } else if (state?.img) {
+                imgUrl = state.img; // Use existing image if no new image uploaded
+            }
+
+            const postData = {
+                title,
+                desc,
+                img: imgUrl,
+                cat,
+                updatedAt: moment().format("YYYY-MM-DD HH:mm:ss"),
+            };
+
+            if (state) {
+                await axios.put(`/posts/${state.id}`, postData);
+            } else {
+                postData.date = postData.updatedAt;
+                postData.createdAt = postData.updatedAt;
+                await axios.post("/posts/", postData);
+            }
             navigate("/");
         } catch (err) {
             console.error("Error posting blog:", err);

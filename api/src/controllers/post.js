@@ -21,8 +21,6 @@ export const getPost = (req, res) => {
     db.query(q, [req.params.id], (err, result) => {
         if (err) return res.status(500).json("There is error in processing!");
 
-        console.log(result[0]);
-
         return res.status(200).json(result[0]);
     });
 };
@@ -33,22 +31,16 @@ export const addPost = (req, res) => {
 
     jwt.verify(token, process.env.PRIVATE_KEY, (err, userInfo) => {
         if (err) return res.status(403).json("Token is not valid!");
-        console.log("test 2");
 
-        const { title, desc, img, date, cat } = req.body;
-
-        console.log("test 3");
+        const { title, desc, img, date, cat, createdAt, updatedAt } = req.body;
 
         if (!title || !desc || !date) {
             return res.status(400).json("Missing required fields!");
         }
 
-        console.log("test 4");
-
         const q =
             "INSERT INTO posts(`title`, `desc`, `img`, `cat`, `date`, `uid`, `createdAt`, `updatedAt`) VALUES (?)";
 
-        console.log("test 5");
         const values = [
             title,
             desc,
@@ -56,18 +48,12 @@ export const addPost = (req, res) => {
             cat,
             date,
             userInfo.id,
-            new Date(),
-            new Date(),
+            createdAt,
+            updatedAt,
         ];
 
-        console.log("test 8");
-        console.log(values);
-
         db.query(q, [values], (err, result) => {
-            console.log("test 9");
-            console.log([values]);
             if (err) {
-                console.log(err);
                 return res.status(400).json("There is error in processing!");
             }
 
@@ -110,7 +96,7 @@ export const updatePost = (req, res) => {
             return res.status(400).json("Request ID is invalid!");
         }
 
-        const { title, desc, img, cat } = req.body;
+        const { title, desc, img, cat, updatedAt } = req.body;
 
         if (!title || !desc) {
             return res.status(400).json("Missing required fields!");
@@ -119,7 +105,7 @@ export const updatePost = (req, res) => {
         const q =
             "UPDATE posts SET `title` = ?, `desc` = ?, `img` = ?, `cat` = ?, `updatedAt` = ? WHERE `id` = ? AND `uid` = ?";
 
-        const values = [title, desc, img, cat, new Date()];
+        const values = [title, desc, img, cat, updatedAt];
 
         db.query(q, [...values, postId, userInfo.id], (err, result) => {
             if (err)

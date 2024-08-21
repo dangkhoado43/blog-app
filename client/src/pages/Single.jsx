@@ -3,15 +3,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import moment from "moment";
 import axios from "axios";
+import { FaRegPenToSquare, FaRegTrashCan } from "react-icons/fa6";
 import { AuthContext } from "../context/AuthContext";
-import Edit from "../assets/imgs/edit.png";
-import Delete from "../assets/imgs/delete.png";
+import DefaultUserImage from "../assets/imgs/default_user.png";
 import Menu from "../components/Menu";
 
 const Single = () => {
     const [post, setPost] = useState({});
-
-    console.log(post);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -45,17 +43,16 @@ const Single = () => {
         fetchPost();
     }, [postId]);
 
-    const getText = (html) => {
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        return doc.body.textContent;
-    };
-
     return (
         <div className="single">
             <div className="content">
-                <img src={`../upload/${post?.img}`} alt="post" />
+                {post.img && <img src={`../upload/${post.img}`} alt="post" />}
                 <div className="user">
-                    {/* {post.userImg && <img src={post.userImg} alt="user" />} */}
+                    {post.userImg ? (
+                        <img src={post.userImg} alt="user" />
+                    ) : (
+                        <img src={DefaultUserImage} alt="user" />
+                    )}
                     <div className="info">
                         <span>{post.username}</span>
                         <p>Posted {moment(post.date).fromNow()}</p>
@@ -63,24 +60,25 @@ const Single = () => {
                     {currentUser.username === post.username && (
                         <div className="edit">
                             <Link to={`/write`} state={post}>
-                                <img src={Edit} alt="update" />
+                                <FaRegPenToSquare className="update" />
                             </Link>
-                            <img
+
+                            <FaRegTrashCan
+                                className="delete"
                                 onClick={handleDelete}
-                                src={Delete}
-                                alt="delete"
                             />
                         </div>
                     )}
                 </div>
-                <h1>{post.title}</h1>
+                <h1 className="title">{post.title}</h1>
                 <p
+                    className="main-content"
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(post.desc),
                     }}
                 ></p>
             </div>
-            <Menu cat={post.cat} />
+            <Menu cat={post.cat} currentPostId={postId} />
         </div>
     );
 };

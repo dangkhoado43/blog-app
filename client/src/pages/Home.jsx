@@ -11,7 +11,7 @@ const Home = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const res = await axios.get(`/posts/?cat=${cat}`);
+                const res = await axios.get(`/posts${cat}`);
                 setPosts(res.data);
             } catch (err) {
                 console.error("Error fetching posts:", err);
@@ -23,6 +23,14 @@ const Home = () => {
     const getText = (html) => {
         const doc = new DOMParser().parseFromString(html, "text/html");
         return doc.body.textContent;
+    };
+
+    const truncateText = (text, maxWords) => {
+        const words = text.split(" ");
+        if (words.length <= maxWords) {
+            return text;
+        }
+        return words.slice(0, maxWords).join(" ") + "...";
     };
 
     // const posts = [
@@ -58,8 +66,8 @@ const Home = () => {
     //     },
     // ];
 
-    const handleReadMore = (id) => {
-        // navigate(`/post/${id}`);
+    const handleReadMore = async (id) => {
+        navigate(`/post/${id}`);
     };
 
     return (
@@ -72,9 +80,9 @@ const Home = () => {
                         </div>
                         <div className="content">
                             <Link to={`/post/${post.id}`} className="link">
-                                <h1>{post.title}</h1>
+                                <h1>{truncateText(post.title, 50)}</h1>
                             </Link>
-                            <p>{getText(post.desc)}</p>
+                            <p>{truncateText(getText(post.desc), 100)}</p>
                             <button onClick={() => handleReadMore(post.id)}>
                                 Read More
                             </button>
